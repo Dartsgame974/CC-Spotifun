@@ -1,19 +1,3 @@
-local SLAXML = require('slaxml')
-
--- Fonction pour télécharger un fichier à partir d'une URL
-local function downloadFile(url, path)
-  local response = http.get(url)
-  if response then
-    local file = fs.open(path, "w")
-    file.write(response.readAll())
-    file.close()
-    response.close()
-    return true
-  else
-    return false
-  end
-end
-
 -- Fonction pour vérifier si un fichier existe
 local function fileExists(path)
   return fs.exists(path) and not fs.isDir(path)
@@ -45,9 +29,19 @@ if not fileExists(upgradePath) then
   shell.run("pastebin", "get", "PvwtVW1S", upgradePath)
 end
 
--- Chargement des bibliothèques AUKit et AUStream
-os.loadAPI(aukitPath)
-os.loadAPI(austreamPath)
+-- Chargement de la bibliothèque AUKit
+local aukit = dofile(aukitPath)
+if not aukit then
+  print("Erreur lors du chargement de la bibliothèque AUKit.")
+  return
+end
+
+-- Chargement de la bibliothèque AUStream
+local austream = dofile(austreamPath)
+if not austream then
+  print("Erreur lors du chargement de la bibliothèque AUStream.")
+  return
+end
 
 local function handleItemChild(childTag, childAttr, childNsURI, childNsPrefix)
   if childTag == "title" then
