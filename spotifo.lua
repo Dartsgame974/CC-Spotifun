@@ -39,9 +39,9 @@ if response then
 
     local function playMusic(title, musicURL)
       shell.run(austream, musicURL)
-      -- Jouer le son "ui.button.click"
+      -- Jouer le son "ui.loom.select_pattern"
       local speaker = peripheral.find("speaker")
-      speaker.playSound("ui.button.click")
+      speaker.playSound("ui.loom.select_pattern")
       -- Afficher le titre de la musique sur le deuxième écran
       local secondMonitor = peripheral.find("monitor", function(_, p) return p ~= monitor end)
       secondMonitor.setTextScale(1)
@@ -121,17 +121,17 @@ if response then
         if y == screenHeight then
           if x == 1 and currentPage > 1 then
             currentPage = currentPage - 1
-            -- Jouer le son "ui.button.click"
+            -- Jouer le son "ui.loom.select_pattern"
             local speaker = peripheral.find("speaker")
-            speaker.playSound("ui.button.click")
+            speaker.playSound("ui.loom.select_pattern")
           elseif x >= screenWidth - 6 and x <= screenWidth then
             currentPage = currentPage + 1
             if currentPage > totalPages then
               currentPage = totalPages
             end
-            -- Jouer le son "ui.button.click"
+            -- Jouer le son "ui.loom.select_pattern"
             local speaker = peripheral.find("speaker")
-            speaker.playSound("ui.button.click")
+            speaker.playSound("ui.loom.select_pattern")
           end
         elseif y >= 5 and y <= screenHeight - 1 then
           local selectedOption = startIndex + (y - 5)
