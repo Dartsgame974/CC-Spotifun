@@ -39,9 +39,6 @@ if response then
 
     local function playMusic(title, musicURL)
       shell.run(austream, musicURL)
-      -- Jouer le son "ui.loom.select_pattern"
-      local speaker = peripheral.find("speaker")
-      speaker.playSound("ui.loom.select_pattern")
       -- Afficher le titre de la musique sur le deuxième écran
       local secondMonitor = peripheral.find("monitor", function(_, p) return p ~= monitor end)
       secondMonitor.setTextScale(1)
@@ -121,29 +118,69 @@ if response then
         if y == screenHeight then
           if x == 1 and currentPage > 1 then
             currentPage = currentPage - 1
-            -- Jouer le son "ui.loom.select_pattern"
+            -- Jouer le son "ui.button.click"
             local speaker = peripheral.find("speaker")
-            speaker.playSound("ui.loom.select_pattern")
+            speaker.playSound("ui.button.click")
           elseif x >= screenWidth - 6 and x <= screenWidth then
             currentPage = currentPage + 1
             if currentPage > totalPages then
               currentPage = totalPages
             end
-            -- Jouer le son "ui.loom.select_pattern"
+            -- Jouer le son "ui.button.click"
             local speaker = peripheral.find("speaker")
-            speaker.playSound("ui.loom.select_pattern")
+            speaker.playSound("ui.button.click")
           end
         elseif y >= 5 and y <= screenHeight - 1 then
           local selectedOption = startIndex + (y - 5)
           if selectedOption <= totalOptions then
             local selectedMusic = playlist[selectedOption]
             playMusic(selectedMusic.title, selectedMusic.link)
+            -- Jouer le son "ui.button.click"
+            local speaker = peripheral.find("speaker")
+            speaker.playSound("ui.button.click")
           end
         end
       end
     end
 
-    displayMusicMenu()
+    local function searchMusic(keyword)
+      local closestMatch = nil
+      local closestDistance = math.huge
+
+      for _, musicTitle in ipairs(musicList) do
+        local distance = string.len(musicTitle) - string.len(keyword)
+        if distance >= 0 and distance < closestDistance then
+          closestMatch = musicTitle
+          closestDistance = distance
+        end
+      end
+
+      return closestMatch
+    end
+
+    local function handleInput()
+      while true do
+        local input = read()
+        local closestMatch = searchMusic(input)
+        if closestMatch then
+          local selectedMusic = nil
+          for _, entry in ipairs(playlist) do
+            if entry.title == closestMatch then
+              selectedMusic = entry
+              break
+            end
+          end
+          if selectedMusic then
+            playMusic(selectedMusic.title, selectedMusic.link)
+            -- Jouer le son "ui.button.click"
+            local speaker = peripheral.find("speaker")
+            speaker.playSound("ui.button.click")
+          end
+        end
+      end
+    end
+
+    parallel.waitForAny(displayMusicMenu, handleInput)
   else
     print("Erreur de parsing du fichier de la liste de lecture.")
   end
