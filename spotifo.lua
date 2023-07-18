@@ -9,11 +9,11 @@ end
 
 -- Vérification et téléchargement des fichiers AUKit et AUStream
 if not fileExists(aukitPath) then
-  shell.run("wget", "https://github.com/MCJack123/AUKit/raw/3ef2f4d4b38d85dc8dae765d7ad3d2c9d5e0029e/aukit.lua", aukitPath)
+  shell.run("wget", "https://github.com/MCJack123/AUKit/raw/master/aukit.lua", aukitPath)
 end
 
 if not fileExists(austreamPath) then
-  shell.run("wget", "https://github.com/MCJack123/AUKit/raw/a6239ba71314729976a3f9d37903f10f0a75913e/austream.lua", austreamPath)
+  shell.run("wget", "https://github.com/MCJack123/AUKit/raw/master/austream.lua", austreamPath)
 end
 
 -- Vérification et téléchargement du fichier "upgrade"
@@ -21,9 +21,7 @@ if not fileExists(upgradePath) then
   shell.run("pastebin", "get", "PvwtVW1S", upgradePath)
 end
 
--- Chargement des bibliothèques AUKit et AUStream
-os.loadAPI(aukitPath)
-os.loadAPI(austreamPath)
+
 
 local playlistURL = "https://raw.githubusercontent.com/Miniprimestaff/music-cc/main/program/playlist.json"
 local response = http.get(playlistURL)
