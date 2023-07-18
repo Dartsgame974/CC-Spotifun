@@ -104,7 +104,7 @@ if response then
         monitor.setTextColor(colors.blue)
         monitor.setCursorPos(1, screenHeight)
         monitor.write("Précédent")
-        monitor.setCursorPos(screenWidth - 8, screenHeight)
+        monitor.setCursorPos(screenWidth - 7, screenHeight)
         monitor.write("Suivant")
 
         local event, side, x, y = os.pullEvent("monitor_touch")
@@ -112,8 +112,11 @@ if response then
         if y == screenHeight then
           if x == 1 and currentPage > 1 then
             currentPage = currentPage - 1
-          elseif x >= screenWidth - 7 and x <= screenWidth and currentPage < totalPages then
+          elseif x >= screenWidth - 6 and x <= screenWidth then
             currentPage = currentPage + 1
+            if currentPage > totalPages then
+              currentPage = totalPages
+            end
           end
         elseif y >= 5 and y <= screenHeight - 1 then
           local selectedOption = startIndex + (y - 4)
