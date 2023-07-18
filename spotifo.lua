@@ -1,15 +1,6 @@
-
--- Chemin des fichiers nécessaires
-local aukit = require "aukit"
+local aukitPath = "aukit.lua"
+local austreamPath = "austream.lua"
 local upgradePath = "upgrade"
-local soundPath = "ui.wav"
-
-if not fs.exists(soundPath) then
-  shell.run("wget", "https://github.com/Dartsgame974/CC-Spotifun/raw/main/ui.wav", soundPath)
-end
-
-local speaker = peripheral.find("speaker")
-aukit.play(aukit.stream.wav(io.lines(soundPath, 48000)), speaker)
 
 -- Fonction pour vérifier si un fichier existe
 local function fileExists(path)
@@ -17,11 +8,11 @@ local function fileExists(path)
 end
 
 -- Vérification et téléchargement des fichiers AUKit et AUStream
-if not fileExists(aukit) then
+if not fileExists(aukitPath) then
   shell.run("wget", "https://github.com/MCJack123/AUKit/raw/master/aukit.lua", aukitPath)
 end
 
-if not fileExists(austream) then
+if not fileExists(austreamPath) then
   shell.run("wget", "https://github.com/MCJack123/AUKit/raw/master/austream.lua", austreamPath)
 end
 
@@ -30,31 +21,8 @@ if not fileExists(upgradePath) then
   shell.run("pastebin", "get", "PvwtVW1S", upgradePath)
 end
 
-
-
-
--- Vérification et téléchargement du fichier de son de démarrage
-local startupSoundURL = "https://github.com/Dartsgame974/CC-Spotifun/raw/main/ui.wav"
-local startupSoundPath = "ui.wav"
-if not fileExists(startupSoundPath) then
-  shell.run("wget", startupSoundURL, startupSoundPath)
-end
-
--- Téléchargement du fichier audio si nécessaire
-local soundPath = "ui.wav"
-if not fs.exists(soundPath) then
-  shell.run("wget", "https://github.com/Dartsgame974/CC-Spotifun/raw/main/ui.wav", soundPath)
-end
-
--- Chargement de la bibliothèque AUKit
-
-
--- Lecture du fichier audio au démarrage
-local speaker = peripheral.find("speaker")
-aukit.play(aukit.stream.wav(io.lines(soundPath, 48000)), speaker)
-
--- Lecture du son de démarrage
-aukit.playSound(startupSoundPath)
+local aukit = require("aukit")
+local austream = shell.resolveProgram("austream")
 
 local playlistURL = "https://raw.githubusercontent.com/Miniprimestaff/music-cc/main/program/playlist.json"
 local response = http.get(playlistURL)
@@ -70,7 +38,7 @@ if response then
     end
 
     local function playMusic(title, musicURL)
-      shell.run(austreamPath, musicURL)
+      shell.run(austream, musicURL)
     end
 
     local function displayMusicMenu()
@@ -145,7 +113,7 @@ if response then
         term.setCursorPos(term.getSize(), itemsPerPage + 7)
         term.write(string.char(16))
 
-        local _, key = os.pullEvent("key")
+        local _, key, x, y = os.pullEvent("key_up", "monitor_touch")
 
         if key == keys.up then
           selectedIndex = selectedIndex - 1
@@ -163,19 +131,10 @@ if response then
         elseif key == keys.right and currentPage < totalPages then
           currentPage = currentPage + 1
           selectedIndex = math.min(selectedIndex, endIndex - startIndex + 1)
-        elseif key == keys.enter then
+        elseif key == keys.enter or (event == "monitor_touch" and side == "right") then
           local selectedOption = startIndex + selectedIndex - 1
           local selectedMusic = playlist[selectedOption]
           playMusic(selectedMusic.title, selectedMusic.link)
-elseif event == "monitor_touch" then
-  -- Vérifiez si le clic est sur le moniteur de musique
-  if side == "right" then -- Remplacez "right" par le côté du moniteur que vous utilisez
-    -- Calculez l'index de la musique sélectionnée en fonction des coordonnées du clic
-    local startIndex = (currentPage - 1) * itemsPerPage + 1
-    local selectedIndex = math.floor((yPos - 5) / 2) + startIndex
-    if selectedIndex >= startIndex and selectedIndex <= endIndex then
-      local selectedMusic = playlist[selectedIndex]
-      playMusic(selectedMusic.title, selectedMusic.link)
         end
       end
     end
