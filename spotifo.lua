@@ -21,8 +21,8 @@ if not fileExists(upgradePath) then
   shell.run("pastebin", "get", "PvwtVW1S", upgradePath)
 end
 
-local monitor = peripheral.find("monitor")
-local secondMonitor = peripheral.find("monitor", function(_, p) return p ~= monitor end)
+local aukit = require("aukit")
+local austream = shell.resolveProgram("austream")
 
 local playlistURL = "https://raw.githubusercontent.com/Miniprimestaff/music-cc/main/program/playlist.json"
 local response = http.get(playlistURL)
@@ -38,12 +38,7 @@ if response then
     end
 
     local function playMusic(title, musicURL)
-      shell.run(austreamPath, musicURL)
-      -- Afficher le titre de la musique sur le deuxième écran
-      secondMonitor.setTextScale(1)
-      secondMonitor.clear()
-      secondMonitor.setCursorPos(1, 1)
-      secondMonitor.write("Titre: " .. title)
+      shell.run(austream, musicURL)
     end
 
     local function displayMusicMenu()
@@ -54,25 +49,16 @@ if response then
       local selectedIndex = 1
 
       -- Boot Menu
+      local monitor = peripheral.find("monitor")
+      monitor.setTextScale(1)
       monitor.clear()
+
       local screenWidth, screenHeight = monitor.getSize()
       local logoHeight = 5
       local logoText = "Spotifo"
       local byText = "by Dartsgame"
       local logoY = math.floor((screenHeight - logoHeight) / 2)
       local logoX = math.floor((screenWidth - #logoText) / 2)
-      monitor.setTextColor(colors.green)
-      monitor.setCursorPos(1, logoY)
-      monitor.write(string.rep(string.char(143), screenWidth))
-      monitor.setCursorPos(1, logoY + 1)
-      monitor.write(string.rep(" ", screenWidth))
-      monitor.setCursorPos(logoX, logoY + 2)
-      monitor.write(logoText)
-      monitor.setCursorPos((screenWidth - #byText) / 2 + 1, logoY + 3)
-      monitor.write(byText)
-      monitor.setCursorPos(1, logoY + 4)
-      monitor.write(string.rep(string.char(143), screenWidth))
-      sleep(2) -- Attente de 2 secondes
 
       while true do
         monitor.clear()
@@ -80,13 +66,13 @@ if response then
 
         monitor.setTextColor(colors.green)
         monitor.setCursorPos(1, 2)
-        monitor.write(string.rep(string.char(143), monitor.getSize()))
+        monitor.write(string.rep(string.char(143), screenWidth))
         monitor.setCursorPos(1, 3)
-        monitor.write(string.rep(" ", monitor.getSize()))
-        monitor.setCursorPos((monitor.getSize() - #logoText) / 2 + 1, 3)
+        monitor.write(string.rep(" ", screenWidth))
+        monitor.setCursorPos((screenWidth - #logoText) / 2 + 1, 3)
         monitor.write(logoText)
         monitor.setCursorPos(1, 4)
-        monitor.write(string.rep(string.char(143), monitor.getSize()))
+        monitor.write(string.rep(string.char(143), screenWidth))
 
         local startIndex = (currentPage - 1) * itemsPerPage + 1
         local endIndex = math.min(startIndex + itemsPerPage - 1, totalOptions)
@@ -102,7 +88,7 @@ if response then
             monitor.setTextColor(colors.gray)
           end
 
-          monitor.setCursorPos(1, 6 + optionIndex)
+          monitor.setCursorPos(1, i - startIndex + 5)
           monitor.write(optionIndex .. " [" .. option .. "]")
         end
 
@@ -110,37 +96,34 @@ if response then
         local pageText = currentPage .. "/" .. totalPages
         local totalText = "Titres " .. totalOptions
         local headerText = logoText .. "  " .. pageText .. "  " .. totalText
-        local headerTextPos = (monitor.getSize() - #headerText) / 2 + 1
+        local headerTextPos = (screenWidth - #headerText) / 2 + 1
         monitor.setCursorPos(headerTextPos, 3)
         monitor.write(headerText)
 
-        monitor.setCursorPos(1, itemsPerPage + 7)
-        monitor.write(string.char(17))
-        monitor.setCursorPos(monitor.getSize(), itemsPerPage + 7)
-        monitor.write(string.char(16))
+        -- Options "Précédent" et "Suivant"
+        monitor.setTextColor(colors.blue)
+        monitor.setCursorPos(1, screenHeight)
+        monitor.write("Précédent")
+        monitor.setCursorPos(screenWidth - 7, screenHeight)
+        monitor.write("Suivant")
 
-        local _, key = os.pullEvent("key")
+        local event, side, x, y = os.pullEvent("monitor_touch")
 
-        if key == keys.up then
-          selectedIndex = selectedIndex - 1
-          if selectedIndex < 1 then
-            selectedIndex = endIndex - startIndex + 1
+        if y == screenHeight then
+          if x == 1 and currentPage > 1 then
+            currentPage = currentPage - 1
+          elseif x >= screenWidth - 6 and x <= screenWidth then
+            currentPage = currentPage + 1
+            if currentPage > totalPages then
+              currentPage = totalPages
+            end
           end
-        elseif key == keys.down then
-          selectedIndex = selectedIndex + 1
-          if selectedIndex > endIndex - startIndex + 1 then
-            selectedIndex = 1
+        elseif y >= 5 and y <= screenHeight - 1 then
+          local selectedOption = startIndex + (y - 5)
+          if selectedOption <= totalOptions then
+            local selectedMusic = playlist[selectedOption]
+            playMusic(selectedMusic.title, selectedMusic.link)
           end
-        elseif key == keys.left and currentPage > 1 then
-          currentPage = currentPage - 1
-          selectedIndex = math.min(selectedIndex, endIndex - startIndex + 1)
-        elseif key == keys.right and currentPage < totalPages then
-          currentPage = currentPage + 1
-          selectedIndex = math.min(selectedIndex, endIndex - startIndex + 1)
-        elseif key == keys.enter then
-          local selectedOption = startIndex + selectedIndex - 1
-          local selectedMusic = playlist[selectedOption]
-          playMusic(selectedMusic.title, selectedMusic.link)
         end
       end
     end
