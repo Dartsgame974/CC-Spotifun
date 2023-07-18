@@ -113,7 +113,8 @@ if response then
         term.setCursorPos(term.getSize(), itemsPerPage + 7)
         term.write(string.char(16))
 
-        local _, key, x, y = os.pullEvent("key_up", "monitor_touch")
+        local event, key = os.pullEvent("key")
+        local _, side, x, y = os.pullEvent("monitor_touch")
 
         if key == keys.up then
           selectedIndex = selectedIndex - 1
