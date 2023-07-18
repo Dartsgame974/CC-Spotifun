@@ -102,7 +102,13 @@ if response then
 
         local event, side, x, y = os.pullEvent("monitor_touch")
 
-        if y >= 5 and y <= endIndex + 4 then
+        if y == screenHeight then
+          if x == 1 and currentPage > 1 then
+            currentPage = currentPage - 1
+          elseif x == screenWidth and currentPage < totalPages then
+            currentPage = currentPage + 1
+          end
+        elseif y >= 5 and y <= endIndex + 4 then
           selectedIndex = y - 4
           local selectedOption = startIndex + selectedIndex - 1
           local selectedMusic = playlist[selectedOption]
