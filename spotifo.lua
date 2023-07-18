@@ -41,7 +41,7 @@ if response then
       shell.run(austream, musicURL)
       -- Jouer le son "ui.button.click"
       local speaker = peripheral.find("speaker")
-      speaker.playSound("ui.button.click")
+      speaker.playSound("entity.arrow.hit")
       -- Afficher le titre de la musique sur le deuxième écran
       local secondMonitor = peripheral.find("monitor", function(_, p) return p ~= monitor end)
       secondMonitor.setTextScale(1)
@@ -123,7 +123,7 @@ if response then
             currentPage = currentPage - 1
             -- Jouer le son "ui.button.click"
             local speaker = peripheral.find("speaker")
-            speaker.playSound("ui.button.click")
+            speaker.playSound("entity.arrow.hit")
           elseif x >= screenWidth - 6 and x <= screenWidth then
             currentPage = currentPage + 1
             if currentPage > totalPages then
@@ -131,7 +131,7 @@ if response then
             end
             -- Jouer le son "ui.button.click"
             local speaker = peripheral.find("speaker")
-            speaker.playSound("ui.button.click")
+            speaker.playSound("entity.arrow.hit")
           end
         elseif y >= 5 and y <= screenHeight - 1 then
           local selectedOption = startIndex + (y - 5)
