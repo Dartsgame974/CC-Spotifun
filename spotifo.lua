@@ -1,24 +1,44 @@
-local aukitPath = "aukit.lua"
-local austreamPath = "austream.lua"
-local upgradePath = "upgrade"
-
 -- Fonction pour vérifier si un fichier existe
 local function fileExists(path)
   return fs.exists(path) and not fs.isDir(path)
 end
 
--- Vérification et téléchargement des fichiers AUKit et AUStream
+-- Vérification de la présence des fichiers aukit.lua et austream.lua
+local aukitPath = "aukit.lua"
+local austreamPath = "austream.lua"
+
 if not fileExists(aukitPath) then
-  shell.run("wget", "https://github.com/MCJack123/AUKit/raw/master/aukit.lua", aukitPath)
+  print("Téléchargement de AUKit...")
+  local aukitURL = "https://github.com/MCJack123/AUKit/raw/master/aukit.lua"
+  local aukitResponse = http.get(aukitURL)
+  if aukitResponse then
+    local aukitData = aukitResponse.readAll()
+    aukitResponse.close()
+
+    local aukitFile = fs.open(aukitPath, "w")
+    aukitFile.write(aukitData)
+    aukitFile.close()
+    print("AUKit téléchargé avec succès.")
+  else
+    error("Erreur lors du téléchargement de AUKit.")
+  end
 end
 
 if not fileExists(austreamPath) then
-  shell.run("wget", "https://github.com/MCJack123/AUKit/raw/master/austream.lua", austreamPath)
-end
+  print("Téléchargement de AUStream...")
+  local austreamURL = "https://github.com/MCJack123/AUKit/raw/master/austream.lua"
+  local austreamResponse = http.get(austreamURL)
+  if austreamResponse then
+    local austreamData = austreamResponse.readAll()
+    austreamResponse.close()
 
--- Vérification et téléchargement du fichier "upgrade"
-if not fileExists(upgradePath) then
-  shell.run("pastebin", "get", "PvwtVW1S", upgradePath)
+    local austreamFile = fs.open(austreamPath, "w")
+    austreamFile.write(austreamData)
+    austreamFile.close()
+    print("AUStream téléchargé avec succès.")
+  else
+    error("Erreur lors du téléchargement de AUStream.")
+  end
 end
 
 -- Chargement des bibliothèques AUKit et AUStream
@@ -39,7 +59,7 @@ if response then
     end
 
     local function playMusic(title, musicURL)
-      shell.run(austreamPath, musicURL)
+      shell.run("austream.lua", musicURL)
     end
 
     local function displayMusicMenu()
