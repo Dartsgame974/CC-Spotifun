@@ -167,6 +167,15 @@ if response then
           local selectedOption = startIndex + selectedIndex - 1
           local selectedMusic = playlist[selectedOption]
           playMusic(selectedMusic.title, selectedMusic.link)
+          elseif event == "monitor_touch" then
+  -- Vérifiez si le clic est sur le moniteur de musique
+  if side == "right" then -- Remplacez "right" par le côté du moniteur que vous utilisez
+    -- Calculez l'index de la musique sélectionnée en fonction des coordonnées du clic
+    local startIndex = (currentPage - 1) * itemsPerPage + 1
+    local selectedIndex = math.floor((yPos - 5) / 2) + startIndex
+    if selectedIndex >= startIndex and selectedIndex <= endIndex then
+      local selectedMusic = playlist[selectedIndex]
+      playMusic(selectedMusic.title, selectedMusic.link)
         end
       end
     end
