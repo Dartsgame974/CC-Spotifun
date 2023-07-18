@@ -39,6 +39,9 @@ if response then
 
     local function playMusic(title, musicURL)
       shell.run(austream, musicURL)
+      -- Jouer le son "ui.button.click"
+      local speaker = peripheral.find("speaker")
+      speaker.playSound("ui.button.click")
       -- Afficher le titre de la musique sur le deuxième écran
       local secondMonitor = peripheral.find("monitor", function(_, p) return p ~= monitor end)
       secondMonitor.setTextScale(1)
@@ -135,52 +138,12 @@ if response then
           if selectedOption <= totalOptions then
             local selectedMusic = playlist[selectedOption]
             playMusic(selectedMusic.title, selectedMusic.link)
-            -- Jouer le son "ui.button.click"
-            local speaker = peripheral.find("speaker")
-            speaker.playSound("ui.button.click")
           end
         end
       end
     end
 
-    local function searchMusic(keyword)
-      local closestMatch = nil
-      local closestDistance = math.huge
-
-      for _, musicTitle in ipairs(musicList) do
-        local distance = string.len(musicTitle) - string.len(keyword)
-        if distance >= 0 and distance < closestDistance then
-          closestMatch = musicTitle
-          closestDistance = distance
-        end
-      end
-
-      return closestMatch
-    end
-
-    local function handleInput()
-      while true do
-        local input = read()
-        local closestMatch = searchMusic(input)
-        if closestMatch then
-          local selectedMusic = nil
-          for _, entry in ipairs(playlist) do
-            if entry.title == closestMatch then
-              selectedMusic = entry
-              break
-            end
-          end
-          if selectedMusic then
-            playMusic(selectedMusic.title, selectedMusic.link)
-            -- Jouer le son "ui.button.click"
-            local speaker = peripheral.find("speaker")
-            speaker.playSound("ui.button.click")
-          end
-        end
-      end
-    end
-
-    parallel.waitForAny(displayMusicMenu, handleInput)
+    displayMusicMenu()
   else
     print("Erreur de parsing du fichier de la liste de lecture.")
   end
