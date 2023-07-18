@@ -1,7 +1,10 @@
 
-
--- Téléchargement du fichier audio si nécessaire
+-- Chemin des fichiers nécessaires
+local aukitPath = "aukit.lua"
+local austreamPath = "austream.lua"
+local upgradePath = "upgrade"
 local soundPath = "ui.wav"
+
 if not fs.exists(soundPath) then
   shell.run("wget", "https://github.com/Dartsgame974/CC-Spotifun/raw/main/ui.wav", soundPath)
 end
