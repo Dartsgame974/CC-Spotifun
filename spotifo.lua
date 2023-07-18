@@ -18,7 +18,7 @@ end
 
 -- Vérification et téléchargement du fichier "upgrade"
 if not fileExists(upgradePath) then
-  shell.run("pastebin", "get", "A1jcaf14", upgradePath)
+  shell.run("pastebin", "get", "PvwtVW1S", upgradePath)
 end
 
 local aukit = require("aukit")
