@@ -45,9 +45,6 @@ if not fileExists(upgradePath) then
   shell.run("pastebin", "get", "Bqjm8ekp", upgradePath)
 end
 
--- Chargement des bibliothèques AUKit et AUStream
-os.loadAPI(aukitPath)
-os.loadAPI(austreamPath)
 
 local function handleItemChild(childTag, childAttr, childNsURI, childNsPrefix)
   if childTag == "title" then
