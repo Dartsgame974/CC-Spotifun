@@ -119,7 +119,7 @@ if response then
           monitor.write(optionIndex .. " [" .. musicList[i] .. "]")
         if #musicList > 0 then
             if musicList[i] then
-              --monitor.write(optionIndex .. " [" .. musicList[i] .. "]")
+              monitor.write(optionIndex .. " [" .. musicList[i] .. "]")
             end
           end
         --end
