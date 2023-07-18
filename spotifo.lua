@@ -1,11 +1,9 @@
 
 -- Chemin des fichiers nécessaires
-local aukitPath = "aukit.lua"
-local austreamPath = "austream.lua"
+local aukit = require "aukit"
 local upgradePath = "upgrade"
 local soundPath = "ui.wav"
 
-local aukit = require "aukit"
 if not fs.exists(soundPath) then
   shell.run("wget", "https://github.com/Dartsgame974/CC-Spotifun/raw/main/ui.wav", soundPath)
 end
@@ -28,11 +26,11 @@ local function fileExists(path)
 end
 
 -- Vérification et téléchargement des fichiers AUKit et AUStream
-if not fileExists(aukitPath) then
+if not fileExists(aukit) then
   shell.run("wget", "https://github.com/MCJack123/AUKit/raw/master/aukit.lua", aukitPath)
 end
 
-if not fileExists(austreamPath) then
+if not fileExists(austream) then
   shell.run("wget", "https://github.com/MCJack123/AUKit/raw/master/austream.lua", austreamPath)
 end
 
