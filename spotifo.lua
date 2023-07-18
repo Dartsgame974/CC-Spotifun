@@ -49,39 +49,30 @@ if response then
       local selectedIndex = 1
 
       -- Boot Menu
-      term.clear()
-      local screenWidth, screenHeight = term.getSize()
+      local monitor = peripheral.find("monitor")
+      monitor.setTextScale(1)
+      monitor.clear()
+
+      local screenWidth, screenHeight = monitor.getSize()
       local logoHeight = 5
       local logoText = "Spotifo"
       local byText = "by Dartsgame"
       local logoY = math.floor((screenHeight - logoHeight) / 2)
       local logoX = math.floor((screenWidth - #logoText) / 2)
-      term.setTextColor(colors.green)
-      term.setCursorPos(1, logoY)
-      term.write(string.rep(string.char(143), screenWidth))
-      term.setCursorPos(1, logoY + 1)
-      term.write(string.rep(" ", screenWidth))
-      term.setCursorPos(logoX, logoY + 2)
-      term.write(logoText)
-      term.setCursorPos((screenWidth - #byText) / 2 + 1, logoY + 3)
-      term.write(byText)
-      term.setCursorPos(1, logoY + 4)
-      term.write(string.rep(string.char(143), screenWidth))
-      sleep(2) -- Attente de 2 secondes
 
       while true do
-        term.clear()
-        term.setCursorPos(1, 3)
+        monitor.clear()
+        monitor.setCursorPos(1, 3)
 
-        term.setTextColor(colors.green)
-        term.setCursorPos(1, 2)
-        term.write(string.rep(string.char(143), term.getSize()))
-        term.setCursorPos(1, 3)
-        term.write(string.rep(" ", term.getSize()))
-        term.setCursorPos((term.getSize() - #logoText) / 2 + 1, 3)
-        term.write(logoText)
-        term.setCursorPos(1, 4)
-        term.write(string.rep(string.char(143), term.getSize()))
+        monitor.setTextColor(colors.green)
+        monitor.setCursorPos(1, 2)
+        monitor.write(string.rep(string.char(143), screenWidth))
+        monitor.setCursorPos(1, 3)
+        monitor.write(string.rep(" ", screenWidth))
+        monitor.setCursorPos((screenWidth - #logoText) / 2 + 1, 3)
+        monitor.write(logoText)
+        monitor.setCursorPos(1, 4)
+        monitor.write(string.rep(string.char(143), screenWidth))
 
         local startIndex = (currentPage - 1) * itemsPerPage + 1
         local endIndex = math.min(startIndex + itemsPerPage - 1, totalOptions)
@@ -91,48 +82,28 @@ if response then
           local option = musicList[i]
 
           if optionIndex == selectedIndex then
-            term.setTextColor(colors.green)
+            monitor.setTextColor(colors.green)
             option = option .. " "
           else
-            term.setTextColor(colors.gray)
+            monitor.setTextColor(colors.gray)
           end
 
-          print(optionIndex, " [" .. option .. "]")
+          monitor.setCursorPos(1, i + 4)
+          monitor.write(optionIndex .. " [" .. option .. "]")
         end
 
-        term.setTextColor(colors.white)
+        monitor.setTextColor(colors.white)
         local pageText = currentPage .. "/" .. totalPages
         local totalText = "Titres " .. totalOptions
         local headerText = logoText .. "  " .. pageText .. "  " .. totalText
-        local headerTextPos = (term.getSize() - #headerText) / 2 + 1
-        term.setCursorPos(headerTextPos, 3)
-        term.write(headerText)
+        local headerTextPos = (screenWidth - #headerText) / 2 + 1
+        monitor.setCursorPos(headerTextPos, 3)
+        monitor.write(headerText)
 
-        term.setCursorPos(1, itemsPerPage + 7)
-        term.write(string.char(17))
-        term.setCursorPos(term.getSize(), itemsPerPage + 7)
-        term.write(string.char(16))
+        local event, side, x, y = os.pullEvent("monitor_touch")
 
-        local event, key = os.pullEvent("key")
-        local _, side, x, y = os.pullEvent("monitor_touch")
-
-        if key == keys.up then
-          selectedIndex = selectedIndex - 1
-          if selectedIndex < 1 then
-            selectedIndex = endIndex - startIndex + 1
-          end
-        elseif key == keys.down then
-          selectedIndex = selectedIndex + 1
-          if selectedIndex > endIndex - startIndex + 1 then
-            selectedIndex = 1
-          end
-        elseif key == keys.left and currentPage > 1 then
-          currentPage = currentPage - 1
-          selectedIndex = math.min(selectedIndex, endIndex - startIndex + 1)
-        elseif key == keys.right and currentPage < totalPages then
-          currentPage = currentPage + 1
-          selectedIndex = math.min(selectedIndex, endIndex - startIndex + 1)
-        elseif key == keys.enter or (event == "monitor_touch" and side == "right") then
+        if y >= 5 and y <= endIndex + 4 then
+          selectedIndex = y - 4
           local selectedOption = startIndex + selectedIndex - 1
           local selectedMusic = playlist[selectedOption]
           playMusic(selectedMusic.title, selectedMusic.link)
