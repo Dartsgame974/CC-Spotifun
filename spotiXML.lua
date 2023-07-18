@@ -1,51 +1,43 @@
+local aukitPath = "aukit.lua"
+local austreamPath = "austream.lua"
+local upgradePath = "upgrade"
+
+-- Fonction pour vérifier si un fichier existe
+local function fileExists(path)
+  return fs.exists(path) and not fs.isDir(path)
+end
+
 -- Vérification et téléchargement des fichiers AUKit et AUStream
-if not fs.exists("aukit.lua") then
-  shell.run("wget", "https://github.com/MCJack123/AUKit/raw/master/aukit.lua", "aukit.lua")
+if not fileExists(aukitPath) then
+  shell.run("wget", "https://github.com/MCJack123/AUKit/raw/master/aukit.lua", aukitPath)
 end
 
-if not fs.exists("austream.lua") then
-  shell.run("wget", "https://github.com/MCJack123/AUKit/raw/master/austream.lua", "austream.lua")
+if not fileExists(austreamPath) then
+  shell.run("wget", "https://github.com/MCJack123/AUKit/raw/master/austream.lua", austreamPath)
 end
 
--- Chargement de la bibliothèque AUKit
-os.loadAPI("aukit.lua")
-
-local xmlURL = "https://crssnt.com/preview/https:/docs.google.com/spreadsheets/d/111D7sGb0GHoGnIbb_vY-1VW50OCekC7kIjLLzUvfvPM/edit#gid=0"
-
--- Fonction pour récupérer le contenu du fichier XML depuis le lien
-local function getXMLContent(url)
-  local response = http.get(url)
-  if response then
-    local content = response.readAll()
-    response.close()
-    return content
-  else
-    return nil
-  end
+-- Vérification et téléchargement du fichier "upgrade"
+if not fileExists(upgradePath) then
+  shell.run("pastebin", "get", "PvwtVW1S", upgradePath)
 end
 
--- Récupération du contenu du fichier XML
-local xmlContent = getXMLContent(xmlURL)
 
-if xmlContent then
-  -- Parsing du fichier XML
-  local xmlData = aukit.parseXML(xmlContent)
 
-  if xmlData and xmlData.rss and xmlData.rss.channel and xmlData.rss.channel.item then
+local playlistURL = "https://crssnt.com/preview/https:/docs.google.com/spreadsheets/d/111D7sGb0GHoGnIbb_vY-1VW50OCekC7kIjLLzUvfvPM/edit#gid=0"
+local response = http.get(playlistURL)
+if response then
+  local playlistData = response.readAll()
+  response.close()
+
+  local success, playlist = pcall(textutils.unserializeJSON, playlistData)
+  if success and type(playlist) == "table" then
     local musicList = {}
-
-    -- Parcours des éléments du canal dans le fichier XML
-    for _, item in ipairs(xmlData.rss.channel.item) do
-      local title = item.title and item.title[1]
-      local link = item.link and item.link[1]
-
-      if title and link then
-        table.insert(musicList, { title = title, link = link })
-      end
+    for _, entry in ipairs(playlist) do
+      table.insert(musicList, entry.title)
     end
 
     local function playMusic(title, musicURL)
-      shell.run("austream.lua", musicURL)
+      shell.run(austreamPath, musicURL)
     end
 
     local function displayMusicMenu()
@@ -99,7 +91,7 @@ if xmlContent then
 
           if optionIndex == selectedIndex then
             term.setTextColor(colors.green)
-            option = option.title .. " "
+            option = option .. " "
           else
             term.setTextColor(colors.gray)
           end
@@ -140,7 +132,7 @@ if xmlContent then
           selectedIndex = math.min(selectedIndex, endIndex - startIndex + 1)
         elseif key == keys.enter then
           local selectedOption = startIndex + selectedIndex - 1
-          local selectedMusic = musicList[selectedOption]
+          local selectedMusic = playlist[selectedOption]
           playMusic(selectedMusic.title, selectedMusic.link)
         end
       end
@@ -148,8 +140,8 @@ if xmlContent then
 
     displayMusicMenu()
   else
-    print("Erreur de parsing du fichier XML.")
+    print("Erreur de parsing du fichier de la liste de lecture.")
   end
 else
-  print("Erreur lors du téléchargement du fichier XML.")
+  print("Erreur lors du téléchargement du fichier de la liste de lecture.")
 end
