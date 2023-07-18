@@ -27,7 +27,14 @@ local startupSoundPath = "startup_sound.wav"
 if not fileExists(startupSoundPath) then
   shell.run("wget", startupSoundURL, startupSoundPath)
 end
-shell.run("play", startupSoundPath, "> /dev/null 2>&1 &")
+
+-- Fonction pour jouer le son de démarrage
+local function playStartupSound()
+  shell.run("play", startupSoundPath, "> /dev/null 2>&1 &")
+end
+
+-- Appel de la fonction pour jouer le son de démarrage
+playStartupSound()
 
 local playlistURL = "https://raw.githubusercontent.com/Miniprimestaff/music-cc/main/program/playlist.json"
 local response = http.get(playlistURL)
