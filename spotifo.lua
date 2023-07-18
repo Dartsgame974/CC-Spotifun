@@ -50,24 +50,6 @@ if response then
       secondMonitor.write("Titre: " .. title)
     end
 
-    local function searchMusic()
-      term.clear()
-      term.setCursorPos(1, 1)
-      term.setTextColor(colors.white)
-      write("Rechercher une musique : ")
-      local searchTerm = read()
-      -- Mettre à jour la liste des options en fonction de la recherche
-      musicList = {}
-      for _, entry in ipairs(playlist) do
-        if string.find(entry.title:lower(), searchTerm:lower()) then
-          table.insert(musicList, entry.title)
-        end
-      end
-      totalOptions = #musicList
-      currentPage = 1
-      selectedIndex = 1
-    end
-
     local function displayMusicMenu()
       local itemsPerPage = 6
       local currentPage = 1
@@ -106,7 +88,7 @@ if response then
 
         for i = startIndex, endIndex do
           local optionIndex = i - startIndex + 1
-          local option = playlist[i].title
+          local option = musicList[i]
 
           if optionIndex == selectedIndex then
             monitor.setTextColor(colors.green)
@@ -116,7 +98,7 @@ if response then
           end
 
           monitor.setCursorPos(1, i - startIndex + 5)
-          monitor.write(optionIndex .. " [" .. musicList[i] .. "]")
+          monitor.write(optionIndex .. " [" .. option .. "]")
         end
 
         monitor.setTextColor(colors.white)
@@ -133,8 +115,6 @@ if response then
         monitor.write("Précédent")
         monitor.setCursorPos(screenWidth - 7, screenHeight)
         monitor.write("Suivant")
-        monitor.setCursorPos(screenWidth - 16, screenHeight)
-        monitor.write("Rechercher")
 
         local event, side, x, y = os.pullEvent("monitor_touch")
 
@@ -152,8 +132,6 @@ if response then
             -- Jouer le son "ui.button.click"
             local speaker = peripheral.find("speaker")
             speaker.playSound("ui.button.click")
-          elseif x >= screenWidth - 15 and x <= screenWidth then
-            searchMusic()
           end
         elseif y >= 5 and y <= screenHeight - 1 then
           local selectedOption = startIndex + (y - 5)
