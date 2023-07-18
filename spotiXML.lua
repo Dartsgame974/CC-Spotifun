@@ -21,9 +21,11 @@ if not fileExists(upgradePath) then
   shell.run("pastebin", "get", "PvwtVW1S", upgradePath)
 end
 
+-- Chargement des bibliothèques AUKit et AUStream
+os.loadAPI(aukitPath)
+os.loadAPI(austreamPath)
 
-
-local playlistURL = "https://crssnt.com/preview/https:/docs.google.com/spreadsheets/d/111D7sGb0GHoGnIbb_vY-1VW50OCekC7kIjLLzUvfvPM/edit#gid=0"
+local playlistURL = "https://raw.githubusercontent.com/Miniprimestaff/music-cc/main/program/playlist.json"
 local response = http.get(playlistURL)
 if response then
   local playlistData = response.readAll()
