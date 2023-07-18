@@ -1,4 +1,18 @@
 local SLAXML = require('slaxml')
+-- Fonction pour télécharger un fichier à partir d'une URL
+local function downloadFile(url, path)
+  local response = http.get(url)
+  if response then
+    local file = fs.open(path, "w")
+    file.write(response.readAll())
+    file.close()
+    response.close()
+    return true
+  else
+    return false
+  end
+end
+
 -- Fonction pour vérifier si un fichier existe
 local function fileExists(path)
   return fs.exists(path) and not fs.isDir(path)
