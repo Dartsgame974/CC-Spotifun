@@ -134,10 +134,40 @@ if response then
             speaker.playSound("ui.button.click")
           end
         elseif y >= 5 and y <= screenHeight - 1 then
-          local selectedOption = startIndex + (y - 5)
-          if selectedOption <= totalOptions then
-            local selectedMusic = playlist[selectedOption]
-            playMusic(selectedMusic.title, selectedMusic.link)
+          if x <= 3 then
+            -- Recherche par mot
+            monitor.clear()
+            monitor.setCursorPos(1, 1)
+            monitor.setTextColor(colors.white)
+            monitor.write("Rechercher: ")
+            local searchText = monitor.read()
+            searchText = string.lower(searchText)
+
+            local foundIndex = nil
+            for i = 1, totalOptions do
+              local option = string.lower(musicList[i])
+              if option:find(searchText, 1, true) then
+                foundIndex = i
+                break
+              end
+            end
+
+            if foundIndex then
+              local selectedMusic = playlist[foundIndex]
+              playMusic(selectedMusic.title, selectedMusic.link)
+            else
+              monitor.clear()
+              monitor.setCursorPos(1, 1)
+              monitor.setTextColor(colors.red)
+              monitor.write("Aucune musique trouvée")
+              os.sleep(2)
+            end
+          else
+            local selectedOption = startIndex + (y - 5)
+            if selectedOption <= totalOptions then
+              local selectedMusic = playlist[selectedOption]
+              playMusic(selectedMusic.title, selectedMusic.link)
+            end
           end
         end
       end
