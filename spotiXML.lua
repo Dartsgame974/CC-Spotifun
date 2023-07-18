@@ -1,6 +1,15 @@
-local SLAXML = require('slaxml')
+local aukitPath = "aukit.lua"
+local austreamPath = "austream.lua"
+local upgradePath = "upgrade"
+local slaxmlPath = "slaxml.lua"
+local slaxdomPath = "slaxdom.lua"
 
--- Fonction pour télécharger un fichier à partir d'une URL
+-- Fonction pour vérifier si un fichier existe
+local function fileExists(path)
+  return fs.exists(path) and not fs.isDir(path)
+end
+
+-- Fonction pour télécharger un fichier depuis une URL
 local function downloadFile(url, path)
   local response = http.get(url)
   if response then
@@ -14,36 +23,40 @@ local function downloadFile(url, path)
   end
 end
 
--- Fonction pour vérifier si un fichier existe
-local function fileExists(path)
-  return fs.exists(path) and not fs.isDir(path)
-end
-
-local aukitPath = "aukit.lua"
-local austreamPath = "austream.lua"
-local upgradePath = "upgrade"
-
 -- Vérification et téléchargement des fichiers AUKit et AUStream
 if not fileExists(aukitPath) then
-  local success = downloadFile("https://github.com/MCJack123/AUKit/raw/master/aukit.lua", aukitPath)
-  if not success then
-    print("Erreur lors du téléchargement du fichier AUKit.")
-    return
-  end
+  shell.run("wget", "https://github.com/MCJack123/AUKit/raw/master/aukit.lua", aukitPath)
 end
 
 if not fileExists(austreamPath) then
-  local success = downloadFile("https://github.com/MCJack123/AUKit/raw/master/austream.lua", austreamPath)
-  if not success then
-    print("Erreur lors du téléchargement du fichier AUStream.")
-    return
-  end
+  shell.run("wget", "https://github.com/MCJack123/AUKit/raw/master/austream.lua", austreamPath)
 end
 
 -- Vérification et téléchargement du fichier "upgrade"
 if not fileExists(upgradePath) then
-  shell.run("pastebin", "get", "Bqjm8ekp", upgradePath)
+  shell.run("pastebin", "get", "PvwtVW1S", upgradePath)
 end
+
+-- Vérification et téléchargement des fichiers slaxml.lua et slaxdom.lua
+if not fileExists(slaxmlPath) then
+  local success = downloadFile("https://raw.githubusercontent.com/Phrogz/SLAXML/master/slaxml.lua", slaxmlPath)
+  if not success then
+    print("Erreur lors du téléchargement du fichier slaxml.lua.")
+    return
+  end
+end
+
+if not fileExists(slaxdomPath) then
+  local success = downloadFile("https://github.com/Phrogz/SLAXML/raw/master/slaxdom.lua", slaxdomPath)
+  if not success then
+    print("Erreur lors du téléchargement du fichier slaxdom.lua.")
+    return
+  end
+end
+
+-- Chargement des bibliothèques AUKit et AUStream
+
+-- Reste du code ...
 
 
 local function handleItemChild(childTag, childAttr, childNsURI, childNsPrefix)
@@ -54,17 +67,15 @@ local function handleItemChild(childTag, childAttr, childNsURI, childNsPrefix)
   end
 end
 
-local function handleXML(tag, attr, nsURI, nsPrefix)
+local function handleStartElement(tag, attr, nsURI, nsPrefix)
   if tag == "item" then
     local title = ""
     local musicURL = ""
 
     SLAXML:parse(handleItemChild)
-    
+
     if title ~= "" and musicURL ~= "" then
-      print("Titre:", title)
-      print("URL de la musique:", musicURL)
-      print()
+      table.insert(musicList, { title = title, link = musicURL })
     end
   end
 end
@@ -78,31 +89,7 @@ if response then
   local musicList = {}
 
   SLAXML:parse(playlistData, {
-    startElement = function(tag, attr, nsURI, nsPrefix)
-      if tag == "item" then
-        local title = ""
-        local musicURL = ""
-
-        handleItemChild = function(childTag, childAttr, childNsURI, childNsPrefix)
-          if childTag == "title" then
-            title = childAttr[1]
-          elseif childTag == "link" then
-            musicURL = childAttr[1]
-          end
-        end
-
-        handleEndElement = function(tag, nsURI, nsPrefix)
-          if tag == "item" and title ~= "" and musicURL ~= "" then
-            table.insert(musicList, { title = title, link = musicURL })
-          end
-        end
-
-        SLAXML:parse(playlistData, {
-          startElement = handleItemChild,
-          endElement = handleEndElement
-        })
-      end
-    end
+    startElement = handleStartElement
   })
 
   local function playMusic(title, musicURL)
