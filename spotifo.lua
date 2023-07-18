@@ -50,6 +50,24 @@ if response then
       secondMonitor.write("Titre: " .. title)
     end
 
+    local function searchMusic()
+      term.clear()
+      term.setCursorPos(1, 1)
+      term.setTextColor(colors.white)
+      write("Rechercher une musique : ")
+      local searchTerm = read()
+      -- Mettre à jour la liste des options en fonction de la recherche
+      musicList = {}
+      for _, entry in ipairs(playlist) do
+        if string.find(entry.title:lower(), searchTerm:lower()) then
+          table.insert(musicList, entry.title)
+        end
+      end
+      totalOptions = #musicList
+      currentPage = 1
+      selectedIndex = 1
+    end
+
     local function displayMusicMenu()
       local itemsPerPage = 6
       local currentPage = 1
@@ -88,7 +106,7 @@ if response then
 
         for i = startIndex, endIndex do
           local optionIndex = i - startIndex + 1
-          local option = musicList[i]
+          local option = playlist[i].title
 
           if optionIndex == selectedIndex then
             monitor.setTextColor(colors.green)
@@ -98,14 +116,7 @@ if response then
           end
 
           monitor.setCursorPos(1, i - startIndex + 5)
-          if #musicList > 0 then
-            if musicList[i] then
-          monitor.write(optionIndex .. " [" .. option .. "]")
-               end
-          end
-        end
-        if not (#musicList > 0) then
-          monitor.write("Aucune musique trouvée")
+          monitor.write(optionIndex .. " [" .. musicList[i] .. "]")
         end
 
         monitor.setTextColor(colors.white)
@@ -122,6 +133,8 @@ if response then
         monitor.write("Précédent")
         monitor.setCursorPos(screenWidth - 7, screenHeight)
         monitor.write("Suivant")
+        monitor.setCursorPos(screenWidth - 16, screenHeight)
+        monitor.write("Rechercher")
 
         local event, side, x, y = os.pullEvent("monitor_touch")
 
@@ -139,42 +152,14 @@ if response then
             -- Jouer le son "ui.button.click"
             local speaker = peripheral.find("speaker")
             speaker.playSound("ui.button.click")
+          elseif x >= screenWidth - 15 and x <= screenWidth then
+            searchMusic()
           end
         elseif y >= 5 and y <= screenHeight - 1 then
-          if x <= 3 then
-            -- Recherche par mot
-            monitor.clear()
-            monitor.setCursorPos(1, 1)
-            monitor.setTextColor(colors.white)
-            monitor.write("Rechercher: ")
-            local searchText = monitor.read()
-            searchText = string.lower(searchText)
-
-            local foundIndex = nil
-            for i = 1, totalOptions do
-              local option = string.lower(musicList[i])
-              if option:find(searchText, 1, true) then
-                foundIndex = i
-                break
-              end
-            end
-
-            if foundIndex then
-              local selectedMusic = playlist[foundIndex]
-              playMusic(selectedMusic.title, selectedMusic.link)
-            else
-              monitor.clear()
-              monitor.setCursorPos(1, 1)
-              monitor.setTextColor(colors.red)
-              monitor.write("Aucune musique trouvée")
-              os.sleep(2)
-            end
-          else
-            local selectedOption = startIndex + (y - 5)
-            if selectedOption <= totalOptions then
-              local selectedMusic = playlist[selectedOption]
-              playMusic(selectedMusic.title, selectedMusic.link)
-            end
+          local selectedOption = startIndex + (y - 5)
+          if selectedOption <= totalOptions then
+            local selectedMusic = playlist[selectedOption]
+            playMusic(selectedMusic.title, selectedMusic.link)
           end
         end
       end
