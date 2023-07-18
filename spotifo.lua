@@ -116,17 +116,15 @@ if response then
           end
 
           monitor.setCursorPos(1, i - startIndex + 5)
-          monitor.write(optionIndex .. " [" .. musicList[i] .. "]")
-        if #musicList > 0 then
+          if #musicList > 0 then
             if musicList[i] then
-              --monitor.write(optionIndex .. " [" .. musicList[i] .. "]")
-            end
-          end
-        --end
+          monitor.write(optionIndex .. " [" .. musicList[i] .. "]")
+        end
+      end
+    end
         if not (#musicList > 0) then
           monitor.write("Aucune musique trouvée")
         end
-
         monitor.setTextColor(colors.white)
         local pageText = currentPage .. "/" .. totalPages
         local totalText = "Titres " .. totalOptions
