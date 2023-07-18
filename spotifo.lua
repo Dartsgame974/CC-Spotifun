@@ -8,17 +8,8 @@ if not fs.exists(soundPath) then
   shell.run("wget", "https://github.com/Dartsgame974/CC-Spotifun/raw/main/ui.wav", soundPath)
 end
 
--- Chargement de la bibliothèque AUKit
-
-
--- Lecture du fichier audio au démarrage
 local speaker = peripheral.find("speaker")
 aukit.play(aukit.stream.wav(io.lines(soundPath, 48000)), speaker)
-
--- Chemin des fichiers nécessaires
-local aukitPath = "aukit.lua"
-local austreamPath = "austream.lua"
-local upgradePath = "upgrade"
 
 -- Fonction pour vérifier si un fichier existe
 local function fileExists(path)
