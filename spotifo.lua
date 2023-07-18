@@ -106,7 +106,7 @@ if response then
 
         for i = startIndex, endIndex do
           local optionIndex = i - startIndex + 1
-          local option = musicList[i]
+          local option = playlist[i].title
 
           if optionIndex == selectedIndex then
             monitor.setTextColor(colors.green)
