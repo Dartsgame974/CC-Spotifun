@@ -18,7 +18,7 @@ end
 
 -- Vérification et téléchargement du fichier "upgrade"
 if not fileExists(upgradePath) then
-  shell.run("pastebin", "get", "PvwtVW1S", upgradePath)
+  shell.run("pastebin", "get", "A1jcaf14", upgradePath)
 end
 
 local aukit = require("aukit")
@@ -88,7 +88,7 @@ if response then
             monitor.setTextColor(colors.gray)
           end
 
-          monitor.setCursorPos(1, i + 4)
+          monitor.setCursorPos(1, i - startIndex + 5)
           monitor.write(optionIndex .. " [" .. option .. "]")
         end
 
@@ -119,7 +119,7 @@ if response then
             end
           end
         elseif y >= 5 and y <= screenHeight - 1 then
-          local selectedOption = startIndex + (y - 4)
+          local selectedOption = startIndex + (y - 5)
           if selectedOption <= totalOptions then
             local selectedMusic = playlist[selectedOption]
             playMusic(selectedMusic.title, selectedMusic.link)
