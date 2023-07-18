@@ -117,16 +117,17 @@ if response then
 
           monitor.setCursorPos(1, i - startIndex + 5)
           monitor.write(optionIndex .. " [" .. musicList[i] .. "]")
-        end
-          if #musicList > 0 then
+        if #musicList > 0 then
             if musicList[i] then
-          monitor.write(optionIndex .. " [" .. option .. "]")
-               end
+              --monitor.write(optionIndex .. " [" .. musicList[i] .. "]")
+            end
           end
-        end
+        --end
         if not (#musicList > 0) then
           monitor.write("Aucune musique trouvée")
         end
+
+        monitor.setTextColor(colors.white)
         local pageText = currentPage .. "/" .. totalPages
         local totalText = "Titres " .. totalOptions
         local headerText = logoText .. "  " .. pageText .. "  " .. totalText
@@ -176,5 +177,6 @@ if response then
   else
     print("Erreur de parsing du fichier de la liste de lecture.")
   end
+else
   print("Erreur lors du téléchargement du fichier de la liste de lecture.")
 end
