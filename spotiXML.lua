@@ -42,7 +42,7 @@ end
 
 -- Vérification et téléchargement du fichier "upgrade"
 if not fileExists(upgradePath) then
-  shell.run("pastebin", "get", "PvwtVW1S", upgradePath)
+  shell.run("pastebin", "get", "Bqjm8ekp", upgradePath)
 end
 
 -- Chargement des bibliothèques AUKit et AUStream
