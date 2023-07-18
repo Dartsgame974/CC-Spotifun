@@ -21,7 +21,13 @@ if not fileExists(upgradePath) then
   shell.run("pastebin", "get", "PvwtVW1S", upgradePath)
 end
 
-
+-- Lecture du son de démarrage
+local startupSoundURL = "https://github.com/Dartsgame974/CC-Spotifun/raw/main/ui.wav"
+local startupSoundPath = "startup_sound.wav"
+if not fileExists(startupSoundPath) then
+  shell.run("wget", startupSoundURL, startupSoundPath)
+end
+shell.run("play", startupSoundPath, "> /dev/null 2>&1 &")
 
 local playlistURL = "https://raw.githubusercontent.com/Miniprimestaff/music-cc/main/program/playlist.json"
 local response = http.get(playlistURL)
