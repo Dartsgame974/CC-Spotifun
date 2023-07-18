@@ -21,20 +21,18 @@ if not fileExists(upgradePath) then
   shell.run("pastebin", "get", "PvwtVW1S", upgradePath)
 end
 
--- Lecture du son de démarrage
+-- Vérification et téléchargement du fichier de son de démarrage
 local startupSoundURL = "https://github.com/Dartsgame974/CC-Spotifun/raw/main/ui.wav"
-local startupSoundPath = "startup_sound.wav"
+local startupSoundPath = "ui.wav"
 if not fileExists(startupSoundPath) then
   shell.run("wget", startupSoundURL, startupSoundPath)
 end
 
--- Fonction pour jouer le son de démarrage
-local function playStartupSound()
-  shell.run("play", startupSoundPath, "> /dev/null 2>&1 &")
-end
+-- Chargement du module aukit
+local aukit = require("aukit")
 
--- Appel de la fonction pour jouer le son de démarrage
-playStartupSound()
+-- Lecture du son de démarrage
+aukit.playSound(startupSoundPath)
 
 local playlistURL = "https://raw.githubusercontent.com/Miniprimestaff/music-cc/main/program/playlist.json"
 local response = http.get(playlistURL)
