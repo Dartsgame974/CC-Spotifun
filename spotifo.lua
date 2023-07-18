@@ -1,3 +1,5 @@
+
+
 -- Téléchargement du fichier audio si nécessaire
 local soundPath = "ui.wav"
 if not fs.exists(soundPath) then
@@ -5,7 +7,7 @@ if not fs.exists(soundPath) then
 end
 
 -- Chargement de la bibliothèque AUKit
-local aukit = require("aukit")
+
 
 -- Lecture du fichier audio au démarrage
 local speaker = peripheral.find("speaker")
@@ -35,11 +37,6 @@ if not fileExists(upgradePath) then
   shell.run("pastebin", "get", "PvwtVW1S", upgradePath)
 end
 
--- Le reste du code...
-
--- Code pour afficher le menu de sélection de musique
-
--- Code pour lire et jouer la musique sélectionnée
 
 
 
@@ -50,8 +47,18 @@ if not fileExists(startupSoundPath) then
   shell.run("wget", startupSoundURL, startupSoundPath)
 end
 
--- Chargement du module aukit
-local aukit = require("aukit")
+-- Téléchargement du fichier audio si nécessaire
+local soundPath = "ui.wav"
+if not fs.exists(soundPath) then
+  shell.run("wget", "https://github.com/Dartsgame974/CC-Spotifun/raw/main/ui.wav", soundPath)
+end
+
+-- Chargement de la bibliothèque AUKit
+
+
+-- Lecture du fichier audio au démarrage
+local speaker = peripheral.find("speaker")
+aukit.play(aukit.stream.wav(io.lines(soundPath, 48000)), speaker)
 
 -- Lecture du son de démarrage
 aukit.playSound(startupSoundPath)
