@@ -1,15 +1,6 @@
-local aukitPath = "aukit.lua"
-local austreamPath = "austream.lua"
-local upgradePath = "upgrade"
-local slaxmlPath = "slaxml.lua"
-local slaxdomPath = "slaxdom.lua"
+local SLAXML = require('slaxml')
 
--- Fonction pour vérifier si un fichier existe
-local function fileExists(path)
-  return fs.exists(path) and not fs.isDir(path)
-end
-
--- Fonction pour télécharger un fichier depuis une URL
+-- Fonction pour télécharger un fichier à partir d'une URL
 local function downloadFile(url, path)
   local response = http.get(url)
   if response then
@@ -23,13 +14,30 @@ local function downloadFile(url, path)
   end
 end
 
+-- Fonction pour vérifier si un fichier existe
+local function fileExists(path)
+  return fs.exists(path) and not fs.isDir(path)
+end
+
+local aukitPath = "aukit.lua"
+local austreamPath = "austream.lua"
+local upgradePath = "upgrade"
+
 -- Vérification et téléchargement des fichiers AUKit et AUStream
 if not fileExists(aukitPath) then
-  shell.run("wget", "https://github.com/MCJack123/AUKit/raw/master/aukit.lua", aukitPath)
+  local success = downloadFile("https://github.com/MCJack123/AUKit/raw/master/aukit.lua", aukitPath)
+  if not success then
+    print("Erreur lors du téléchargement du fichier AUKit.")
+    return
+  end
 end
 
 if not fileExists(austreamPath) then
-  shell.run("wget", "https://github.com/MCJack123/AUKit/raw/master/austream.lua", austreamPath)
+  local success = downloadFile("https://github.com/MCJack123/AUKit/raw/master/austream.lua", austreamPath)
+  if not success then
+    print("Erreur lors du téléchargement du fichier AUStream.")
+    return
+  end
 end
 
 -- Vérification et téléchargement du fichier "upgrade"
@@ -37,27 +45,9 @@ if not fileExists(upgradePath) then
   shell.run("pastebin", "get", "PvwtVW1S", upgradePath)
 end
 
--- Vérification et téléchargement des fichiers slaxml.lua et slaxdom.lua
-if not fileExists(slaxmlPath) then
-  local success = downloadFile("https://raw.githubusercontent.com/Phrogz/SLAXML/master/slaxml.lua", slaxmlPath)
-  if not success then
-    print("Erreur lors du téléchargement du fichier slaxml.lua.")
-    return
-  end
-end
-
-if not fileExists(slaxdomPath) then
-  local success = downloadFile("https://github.com/Phrogz/SLAXML/raw/master/slaxdom.lua", slaxdomPath)
-  if not success then
-    print("Erreur lors du téléchargement du fichier slaxdom.lua.")
-    return
-  end
-end
-
 -- Chargement des bibliothèques AUKit et AUStream
-
--- Reste du code ...
-
+os.loadAPI(aukitPath)
+os.loadAPI(austreamPath)
 
 local function handleItemChild(childTag, childAttr, childNsURI, childNsPrefix)
   if childTag == "title" then
@@ -72,7 +62,9 @@ local function handleStartElement(tag, attr, nsURI, nsPrefix)
     local title = ""
     local musicURL = ""
 
-    SLAXML:parse(handleItemChild)
+    SLAXML:parse(handleItemChild, {
+      startElement = handleStartElement
+    })
 
     if title ~= "" and musicURL ~= "" then
       table.insert(musicList, { title = title, link = musicURL })
