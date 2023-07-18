@@ -100,19 +100,27 @@ if response then
         monitor.setCursorPos(headerTextPos, 3)
         monitor.write(headerText)
 
+        -- Options "Précédent" et "Suivant"
+        monitor.setTextColor(colors.blue)
+        monitor.setCursorPos(1, screenHeight)
+        monitor.write("Précédent")
+        monitor.setCursorPos(screenWidth - 8, screenHeight)
+        monitor.write("Suivant")
+
         local event, side, x, y = os.pullEvent("monitor_touch")
 
         if y == screenHeight then
           if x == 1 and currentPage > 1 then
             currentPage = currentPage - 1
-          elseif x == screenWidth and currentPage < totalPages then
+          elseif x >= screenWidth - 7 and x <= screenWidth and currentPage < totalPages then
             currentPage = currentPage + 1
           end
-        elseif y >= 5 and y <= endIndex + 4 then
-          selectedIndex = y - 4
-          local selectedOption = startIndex + selectedIndex - 1
-          local selectedMusic = playlist[selectedOption]
-          playMusic(selectedMusic.title, selectedMusic.link)
+        elseif y >= 5 and y <= screenHeight - 1 then
+          local selectedOption = startIndex + (y - 4)
+          if selectedOption <= totalOptions then
+            local selectedMusic = playlist[selectedOption]
+            playMusic(selectedMusic.title, selectedMusic.link)
+          end
         end
       end
     end
