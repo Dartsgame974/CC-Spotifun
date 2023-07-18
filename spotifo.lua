@@ -116,7 +116,7 @@ if response then
           end
 
           monitor.setCursorPos(1, i - startIndex + 5)
-          monitor.write(optionIndex .. " [" .. option .. "]")
+          monitor.write(optionIndex .. " [" .. musicList[i] .. "]")
         end
 
         monitor.setTextColor(colors.white)
