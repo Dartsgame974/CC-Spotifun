@@ -39,16 +39,15 @@ if response then
 
     local function playMusic(title, musicURL)
       shell.run(austream, musicURL)
+      -- Jouer le son "ui.button.click"
+      local speaker = peripheral.find("speaker")
+      speaker.playSound("ui.button.click")
       -- Afficher le titre de la musique sur le deuxième écran
       local secondMonitor = peripheral.find("monitor", function(_, p) return p ~= monitor end)
       secondMonitor.setTextScale(1)
       secondMonitor.clear()
       secondMonitor.setCursorPos(1, 1)
       secondMonitor.write("Titre: " .. title)
-    end
-
-    local function pauseMusic()
-      shell.run(austream, "-p")
     end
 
     local function displayMusicMenu()
@@ -117,23 +116,22 @@ if response then
         monitor.setCursorPos(screenWidth - 7, screenHeight)
         monitor.write("Suivant")
 
-        -- Bouton "Pause"
-        monitor.setTextColor(colors.red)
-        monitor.setCursorPos((screenWidth - 5) / 2 + 1, screenHeight)
-        monitor.write("Pause")
-
         local event, side, x, y = os.pullEvent("monitor_touch")
 
         if y == screenHeight then
           if x == 1 and currentPage > 1 then
             currentPage = currentPage - 1
+            -- Jouer le son "ui.button.click"
+            local speaker = peripheral.find("speaker")
+            speaker.playSound("ui.button.click")
           elseif x >= screenWidth - 6 and x <= screenWidth then
             currentPage = currentPage + 1
             if currentPage > totalPages then
               currentPage = totalPages
             end
-          elseif x >= (screenWidth - 5) / 2 + 1 and x <= (screenWidth - 5) / 2 + 5 then
-            pauseMusic()
+            -- Jouer le son "ui.button.click"
+            local speaker = peripheral.find("speaker")
+            speaker.playSound("ui.button.click")
           end
         elseif y >= 5 and y <= screenHeight - 1 then
           local selectedOption = startIndex + (y - 5)
