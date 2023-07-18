@@ -1,3 +1,4 @@
+local SLAXML = require('slaxml')
 -- Fonction pour vérifier si un fichier existe
 local function fileExists(path)
   return fs.exists(path) and not fs.isDir(path)
