@@ -1,6 +1,3 @@
-local austream = shell.resolveProgram("austream")
-local xmlURL = "https://crssnt.com/preview/https:/docs.google.com/spreadsheets/d/111D7sGb0GHoGnIbb_vY-1VW50OCekC7kIjLLzUvfvPM/edit#gid=0"
-
 -- Vérification et téléchargement des fichiers AUKit et AUStream
 if not fs.exists("aukit.lua") then
   shell.run("wget", "https://github.com/MCJack123/AUKit/raw/master/aukit.lua", "aukit.lua")
@@ -10,9 +7,10 @@ if not fs.exists("austream.lua") then
   shell.run("wget", "https://github.com/MCJack123/AUKit/raw/master/austream.lua", "austream.lua")
 end
 
--- Chargement des bibliothèques AUKit et AUStream
+-- Chargement de la bibliothèque AUKit
 os.loadAPI("aukit.lua")
-os.loadAPI("austream.lua")
+
+local xmlURL = "https://crssnt.com/preview/https:/docs.google.com/spreadsheets/d/111D7sGb0GHoGnIbb_vY-1VW50OCekC7kIjLLzUvfvPM/edit#gid=0"
 
 -- Fonction pour récupérer le contenu du fichier XML depuis le lien
 local function getXMLContent(url)
@@ -33,11 +31,11 @@ if xmlContent then
   -- Parsing du fichier XML
   local xmlData = aukit.parseXML(xmlContent)
 
-  if xmlData and xmlData.channel and xmlData.channel.item then
+  if xmlData and xmlData.rss and xmlData.rss.channel and xmlData.rss.channel.item then
     local musicList = {}
 
     -- Parcours des éléments du canal dans le fichier XML
-    for _, item in ipairs(xmlData.channel.item) do
+    for _, item in ipairs(xmlData.rss.channel.item) do
       local title = item.title and item.title[1]
       local link = item.link and item.link[1]
 
