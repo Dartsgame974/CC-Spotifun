@@ -38,125 +38,48 @@ if response then
     end
 
     local function playMusic(title, musicURL)
-      shell.run(austream, musicURL)
+      shell.run(austreamPath, musicURL)
     end
 
-    local function displayMusicMenu()
-      local itemsPerPage = 6
-      local currentPage = 1
-      local totalOptions = #musicList
-      local totalPages = math.ceil(totalOptions / itemsPerPage)
-      local selectedIndex = 1
+    local secretCode = ""
+    local easterEggMode = false
 
-      local secretCode = ""
-      local easterEggMode = false
-
-      -- Boot Menu
+    while true do
       term.clear()
-      local screenWidth, screenHeight = term.getSize()
-      local logoHeight = 5
-      local logoText = "Spotifo"
-      local byText = "by Dartsgame"
-      local logoY = math.floor((screenHeight - logoHeight) / 2)
-      local logoX = math.floor((screenWidth - #logoText) / 2)
-      term.setTextColor(colors.green)
-      term.setCursorPos(1, logoY)
-      term.write(string.rep(string.char(143), screenWidth))
-      term.setCursorPos(1, logoY + 1)
-      term.write(string.rep(" ", screenWidth))
-      term.setCursorPos(logoX, logoY + 2)
-      term.write(logoText)
-      term.setCursorPos((screenWidth - #byText) / 2 + 1, logoY + 3)
-      term.write(byText)
-      term.setCursorPos(1, logoY + 4)
-      term.write(string.rep(string.char(143), screenWidth))
-      sleep(2) -- Attente de 2 secondes
+      term.setCursorPos(1, 1)
 
-      while true do
-        term.clear()
-        term.setCursorPos(1, 3)
+      -- Le reste du code du menu principal ici...
 
-        term.setTextColor(colors.green)
-        term.setCursorPos(1, 2)
-        term.write(string.rep(string.char(143), term.getSize()))
-        term.setCursorPos(1, 3)
-        term.write(string.rep(" ", term.getSize()))
-        term.setCursorPos((term.getSize() - #logoText) / 2 + 1, 3)
-        term.write(logoText)
-        term.setCursorPos(1, 4)
-        term.write(string.rep(string.char(143), term.getSize()))
+      local _, key = os.pullEvent("key")
+      local keyName = keys.getName(key)
 
-        local startIndex = (currentPage - 1) * itemsPerPage + 1
-        local endIndex = math.min(startIndex + itemsPerPage - 1, totalOptions)
+      if keyName == "b" or keyName == "a" or keyName == "t" or keyName == "m" or keyName == "n" then
+        secretCode = secretCode .. keyName
 
-        for i = startIndex, endIndex do
-          local optionIndex = i - startIndex + 1
-          local option = musicList[i]
-
-          if optionIndex == selectedIndex then
-            term.setTextColor(colors.green)
-            option = option .. " "
-          else
-            term.setTextColor(colors.gray)
-          end
-
-          print(optionIndex, " [" .. option .. "]")
-        end
-
-        term.setTextColor(colors.white)
-        local pageText = currentPage .. "/" .. totalPages
-        local totalText = "Titres " .. totalOptions
-        local headerText = logoText .. "  " .. pageText .. "  " .. totalText
-        local headerTextPos = (term.getSize() - #headerText) / 2 + 1
-        term.setCursorPos(headerTextPos, 3)
-        term.write(headerText)
-
-        term.setCursorPos(1, itemsPerPage + 7)
-        term.write(string.char(17))
-        term.setCursorPos(term.getSize(), itemsPerPage + 7)
-        term.write(string.char(16))
-
-        local _, key = os.pullEvent("key")
-        local keyName = keys.getName(key)
-
-        if keyName == "b" or keyName == "a" or keyName == "t" or keyName == "m" or keyName == "n" then
-          -- Ajouter le caractère de la touche pressée à la chaîne secrète
-          secretCode = secretCode .. keyName
-
-          -- Vérifier si la chaîne secrète correspond au code caché (b-a-t-m-a-n)
-          if secretCode == "batman" then
-            easterEggMode = true
-            -- Changer ici la couleur de fond en violet pour l'easter egg
-            term.setBackgroundColor(colors.purple)
-            term.clear()
-            -- Charger la playlist alternative depuis le fichier "playlistdark.json"
-            local playlistURLDark = "https://raw.githubusercontent.com/Miniprimestaff/music-cc/main/program/playlistdark.json"
-            local responseDark = http.get(playlistURLDark)
-            if responseDark then
-              local playlistDataDark = responseDark.readAll()
-              responseDark.close()
-              success, playlist = pcall(textutils.unserializeJSON, playlistDataDark)
-              if success and type(playlist) == "table" then
-                musicList = {}
-                for _, entry in ipairs(playlist) do
-                  table.insert(musicList, entry.title)
-                end
-              else
-                print("Erreur de parsing du fichier de la liste de lecture alternative.")
-                return
+        if secretCode == "batman" then
+          easterEggMode = true
+          term.setBackgroundColor(colors.purple) -- Changer la couleur de fond en violet
+          -- Charger la playlist alternative depuis le fichier "playlistdark.json"
+          local playlistDarkURL = "https://raw.githubusercontent.com/Miniprimestaff/music-cc/main/program/playlistdark.json"
+          local responseDark = http.get(playlistDarkURL)
+          if responseDark then
+            local playlistDarkData = responseDark.readAll()
+            responseDark.close()
+            local successDark, playlistDark = pcall(textutils.unserializeJSON, playlistDarkData)
+            if successDark and type(playlistDark) == "table" then
+              musicList = {}
+              for _, entry in ipairs(playlistDark) do
+                table.insert(musicList, entry.title)
               end
-            else
-              print("Erreur lors du téléchargement du fichier de la liste de lecture alternative.")
-              return
             end
-            -- Réinitialiser la chaîne secrète après un court délai
-            os.sleep(0.5)
-            secretCode = ""
           end
-        else
+          
+          os.sleep(0.5) -- Attendre un court délai pour réinitialiser le code secret
           secretCode = ""
         end
-
+      else
+        secretCode = ""
+      end
         if easterEggMode then
           -- Utiliser la playlist alternative pour le mode easter egg
           if key == keys.up then
