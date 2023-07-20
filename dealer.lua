@@ -42,6 +42,14 @@ if response then
     local easterEggActivated = false
     local rightArrowCount = 0
 
+    local function resetEasterEgg()
+      easterEggActivated = false
+      rightArrowCount = 0
+      -- Changer ici la couleur de fond en vert pour revenir à la version originale
+      -- Charger la playlist originale depuis le fichier "playlist.json"
+      playlistURL = "https://raw.githubusercontent.com/Miniprimestaff/music-cc/main/program/playlist.json"
+    end
+
     -- Déclaration de la variable option en dehors de la boucle while
     local option
 
@@ -150,6 +158,11 @@ if response then
           local selectedOption = startIndex + selectedIndex - 1
           local selectedMusic = playlist[selectedOption]
           playMusic(selectedMusic.title, selectedMusic.link)
+        end
+
+        -- Si l'easter egg est activé et l'utilisateur appuie sur une autre touche, réinitialiser l'easter egg
+        if easterEggActivated and keyName ~= "right" then
+          resetEasterEgg()
         end
       end
     end
