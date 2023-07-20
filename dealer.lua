@@ -39,8 +39,8 @@ if response then
     end
 
     -- Variables pour l'easter egg
-    local secretCode = ""
     local easterEggActivated = false
+    local rightArrowCount = 0
 
     local function displayMusicMenu()
       local itemsPerPage = 6
@@ -117,40 +117,33 @@ if response then
         local _, key = os.pullEvent("key")
         local keyName = keys.getName(key)
 
-        if keyName == "b" or keyName == "a" or keyName == "t" or keyName == "m" or keyName == "n" then
-          -- Ajouter le caractère de la touche pressée à la chaîne secrète
-          secretCode = secretCode .. keyName
-
-          -- Vérifier si la chaîne secrète correspond au code caché (b-a-t-m-a-n)
-          if secretCode == "batman" then
-            easterEggActivated = true
-            -- Changer ici la couleur de fond en violet pour l'easter egg
-            -- Charger la playlist alternative depuis le fichier "playlistdark.json"
-            playlistURL = "https://raw.githubusercontent.com/Miniprimestaff/music-cc/main/program/playlistdark.json"
-            os.sleep(0.5)
-            secretCode = ""
-          end
-        else
-          secretCode = ""
-        end
-
-        if keyName == keys.up then
+        if key == keys.up then
           selectedIndex = selectedIndex - 1
           if selectedIndex < 1 then
             selectedIndex = endIndex - startIndex + 1
           end
-        elseif keyName == keys.down then
+        elseif key == keys.down then
           selectedIndex = selectedIndex + 1
           if selectedIndex > endIndex - startIndex + 1 then
             selectedIndex = 1
           end
-        elseif keyName == keys.left and currentPage > 1 then
+        elseif key == keys.left and currentPage > 1 then
           currentPage = currentPage - 1
           selectedIndex = math.min(selectedIndex, endIndex - startIndex + 1)
-        elseif keyName == keys.right and currentPage < totalPages then
+        elseif key == keys.right and currentPage < totalPages then
+          -- Vérifier si l'utilisateur a appuyé sur la flèche droite 6 fois depuis la dernière page
+          if currentPage == totalPages then
+            rightArrowCount = rightArrowCount + 1
+            if rightArrowCount >= 6 then
+              easterEggActivated = true
+              -- Changer ici la couleur de fond en violet pour l'easter egg
+              -- Charger la playlist alternative depuis le fichier "playlistdark.json"
+              playlistURL = "https://raw.githubusercontent.com/Miniprimestaff/music-cc/main/program/playlistdark.json"
+            end
+          end
           currentPage = currentPage + 1
           selectedIndex = math.min(selectedIndex, endIndex - startIndex + 1)
-        elseif keyName == keys.enter then
+        elseif key == keys.enter then
           local selectedOption = startIndex + selectedIndex - 1
           local selectedMusic = playlist[selectedOption]
           playMusic(selectedMusic.title, selectedMusic.link)
