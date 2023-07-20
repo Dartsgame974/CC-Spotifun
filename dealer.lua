@@ -52,31 +52,90 @@ if response then
       local easterEggMode = false
 
       -- Boot Menu
+      term.setBackgroundColor(colors.black)
       term.clear()
+      term.setTextColor(colors.red)
+
+      -- Afficher le texte "JAILBREAK débloqué" au milieu clignotant
       local screenWidth, screenHeight = term.getSize()
-      local logoHeight = 5
-      local logoText = "Spotifo"
-      local byText = "by Dartsgame"
-      local logoY = math.floor((screenHeight - logoHeight) / 2)
-      local logoX = math.floor((screenWidth - #logoText) / 2)
-      term.setTextColor(colors.green)
-      term.setCursorPos(1, logoY)
-      term.write(string.rep(string.char(143), screenWidth))
-      term.setCursorPos(1, logoY + 1)
-      term.write(string.rep(" ", screenWidth))
-      term.setCursorPos(logoX, logoY + 2)
-      term.write(logoText)
-      term.setCursorPos((screenWidth - #byText) / 2 + 1, logoY + 3)
-      term.write(byText)
-      term.setCursorPos(1, logoY + 4)
-      term.write(string.rep(string.char(143), screenWidth))
+      local text = "JAILBREAK débloqué"
+      local textX = math.floor((screenWidth - #text) / 2)
+      local textY = math.floor(screenHeight / 2)
+      while not easterEggMode do
+        term.setCursorPos(textX, textY)
+        term.write(text)
+        sleep(0.5)
+        term.setCursorPos(textX, textY)
+        term.write(string.rep(" ", #text))
+        sleep(0.5)
+        -- Vérifier si la combinaison de touches "b-a-t-m-a-n" est entrée pour activer le mode easter egg
+        local _, key = os.pullEvent("key")
+        local keyName = keys.getName(key)
+        if keyName == "b" then
+          secretCode = "b"
+          while keyName == "b" do
+            _, key = os.pullEvent("key")
+            keyName = keys.getName(key)
+          end
+        elseif keyName == "a" and secretCode == "b" then
+          secretCode = "ba"
+          while keyName == "a" do
+            _, key = os.pullEvent("key")
+            keyName = keys.getName(key)
+          end
+        elseif keyName == "t" and secretCode == "ba" then
+          secretCode = "bat"
+          while keyName == "t" do
+            _, key = os.pullEvent("key")
+            keyName = keys.getName(key)
+          end
+        elseif keyName == "m" and secretCode == "bat" then
+          secretCode = "batm"
+          while keyName == "m" do
+            _, key = os.pullEvent("key")
+            keyName = keys.getName(key)
+          end
+        elseif keyName == "a" and secretCode == "batm" then
+          secretCode = "batma"
+          while keyName == "a" do
+            _, key = os.pullEvent("key")
+            keyName = keys.getName(key)
+          end
+        elseif keyName == "n" and secretCode == "batma" then
+          secretCode = "batman"
+          easterEggMode = true
+        else
+          secretCode = ""
+        end
+      end
+
+      -- Changer ici la couleur de fond en rouge pour l'easter egg
+      term.setBackgroundColor(colors.red)
+      term.clear()
+
+      -- Afficher le logo "Torrent" au milieu en rouge sur fond noir
+      local logo = [[
+ _______  _______  __   __  _______    _______  _______  ______    _______ 
+|       ||   _   ||  |_|  ||       |  |       ||       ||    _ |  |       |
+|    ___||  |_|  ||       ||    _  |  |_     _||   _   ||   | ||  |  _____|
+|   |___ |       ||       ||   |_| |    |   |  |  | |  ||   |_||_ | |_____ 
+|    ___||       ||       ||    ___|    |   |  |  |_|  ||    __  ||_____  |
+|   |___ |   _   | |     | |   |        |   |  |       ||   |  | | _____| |
+|_______||__| |__|  |___|  |___|        |___|  |_______||___|  |_||_______|
+]]
+      local logoX = math.floor((screenWidth - 53) / 2)
+      local logoY = math.floor((screenHeight - 7) / 2)
+      term.setTextColor(colors.red)
+      term.setCursorPos(logoX, logoY)
+      term.write(logo)
+
       sleep(2) -- Attente de 2 secondes
 
       while true do
         term.clear()
         term.setCursorPos(1, 3)
 
-        term.setTextColor(colors.green)
+        term.setTextColor(colors.red)
         term.setCursorPos(1, 2)
         term.write(string.rep(string.char(143), term.getSize()))
         term.setCursorPos(1, 3)
@@ -94,10 +153,10 @@ if response then
           local option = musicList[i]
 
           if optionIndex == selectedIndex then
-            term.setTextColor(colors.green)
+            term.setTextColor(colors.red)
             option = option .. " "
           else
-            term.setTextColor(colors.gray)
+            term.setTextColor(colors.white)
           end
 
           print(optionIndex, " [" .. option .. "]")
@@ -117,98 +176,33 @@ if response then
         term.write(string.char(16))
 
         local _, key = os.pullEvent("key")
-        local keyName = keys.getName(key)
 
-        if keyName == "b" or keyName == "a" or keyName == "t" or keyName == "m" or keyName == "n" then
-          -- Ajouter le caractère de la touche pressée à la chaîne secrète
-          secretCode = secretCode .. keyName
-
-          -- Vérifier si la chaîne secrète correspond au code caché (b-a-t-m-a-n)
-          if secretCode == "batman" then
-            easterEggMode = true
-            -- Changer ici la couleur de fond en violet pour l'easter egg
-            term.setBackgroundColor(colors.purple)
-            term.clear()
-            -- Charger la playlist alternative depuis le fichier "playlistdark.json"
-            local playlistURLDark = "https://raw.githubusercontent.com/Miniprimestaff/music-cc/main/program/playlistdark.json"
-            local responseDark = http.get(playlistURLDark)
-            if responseDark then
-              local playlistDataDark = responseDark.readAll()
-              responseDark.close()
-              success, playlist = pcall(textutils.unserializeJSON, playlistDataDark)
-              if success and type(playlist) == "table" then
-                musicList = {}
-                for _, entry in ipairs(playlist) do
-                  table.insert(musicList, entry.title)
-                end
-              else
-                print("Erreur de parsing du fichier de la liste de lecture alternative.")
-                return
-              end
-            else
-              print("Erreur lors du téléchargement du fichier de la liste de lecture alternative.")
-              return
-            end
-            -- Réinitialiser la chaîne secrète après un court délai
-            os.sleep(0.5)
-            secretCode = ""
+        if key == keys.up then
+          selectedIndex = selectedIndex - 1
+          if selectedIndex < 1 then
+            selectedIndex = totalOptions
           end
-        else
-          secretCode = ""
-        end
-
-        if easterEggMode then
-          -- Utiliser la playlist alternative pour le mode easter egg
-          if key == keys.up then
-            selectedIndex = selectedIndex - 1
-            if selectedIndex < 1 then
-              selectedIndex = endIndex - startIndex + 1
-            end
-          elseif key == keys.down then
-            selectedIndex = selectedIndex + 1
-            if selectedIndex > endIndex - startIndex + 1 then
-              selectedIndex = 1
-            end
-          elseif key == keys.left and currentPage > 1 then
-            currentPage = currentPage - 1
-            selectedIndex = math.min(selectedIndex, endIndex - startIndex + 1)
-          elseif key == keys.right and currentPage < totalPages then
-            currentPage = currentPage + 1
-            selectedIndex = math.min(selectedIndex, endIndex - startIndex + 1)
-          elseif key == keys.enter then
-            local selectedOption = startIndex + selectedIndex - 1
-            local selectedMusic = playlist[selectedOption]
-            playMusic(selectedMusic.title, selectedMusic.link)
+        elseif key == keys.down then
+          selectedIndex = selectedIndex + 1
+          if selectedIndex > totalOptions then
+            selectedIndex = 1
           end
-        else
-          -- Utiliser la playlist normale pour le mode normal
-          if key == keys.up then
-            selectedIndex = selectedIndex - 1
-            if selectedIndex < 1 then
-              selectedIndex = totalOptions
-            end
-          elseif key == keys.down then
-            selectedIndex = selectedIndex + 1
-            if selectedIndex > totalOptions then
-              selectedIndex = 1
-            end
-          elseif key == keys.left then
-            currentPage = currentPage - 1
-            if currentPage < 1 then
-              currentPage = totalPages
-            end
-            selectedIndex = math.min(selectedIndex, endIndex - startIndex + 1)
-          elseif key == keys.right then
-            currentPage = currentPage + 1
-            if currentPage > totalPages then
-              currentPage = 1
-            end
-            selectedIndex = math.min(selectedIndex, endIndex - startIndex + 1)
-          elseif key == keys.enter then
-            local selectedOption = startIndex + selectedIndex - 1
-            local selectedMusic = playlist[selectedOption]
-            playMusic(selectedMusic.title, selectedMusic.link)
+        elseif key == keys.left then
+          currentPage = currentPage - 1
+          if currentPage < 1 then
+            currentPage = totalPages
           end
+          selectedIndex = math.min(selectedIndex, endIndex - startIndex + 1)
+        elseif key == keys.right then
+          currentPage = currentPage + 1
+          if currentPage > totalPages then
+            currentPage = 1
+          end
+          selectedIndex = math.min(selectedIndex, endIndex - startIndex + 1)
+        elseif key == keys.enter then
+          local selectedOption = startIndex + selectedIndex - 1
+          local selectedMusic = playlist[selectedOption]
+          playMusic(selectedMusic.title, selectedMusic.link)
         end
       end
     end
