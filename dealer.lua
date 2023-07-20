@@ -53,15 +53,15 @@ if response then
       playlistURL = normalPlaylistURL
     end
 
-    -- Déclaration de la variable option en dehors de la boucle while
-    local option
-
     local function displayMainMenu()
-      local itemsPerPage = 3
+      local itemsPerPage = 6
       local currentPage = 1
-      local totalOptions = 3
+      local totalOptions = #musicList
       local totalPages = math.ceil(totalOptions / itemsPerPage)
       local selectedIndex = 1
+
+      local menuOptions = {"Play", "Options", "Quitter"}
+      local totalMenuOptions = #menuOptions
 
       while true do
         term.clear()
@@ -79,18 +79,33 @@ if response then
         term.setCursorPos(headerTextPos, 3)
         term.write(headerText)
 
+        -- Afficher les options du menu principal
+        for i = 1, totalMenuOptions do
+          if i == selectedIndex then
+            term.setTextColor(colors.green)
+          else
+            term.setTextColor(colors.white)
+          end
+          term.setCursorPos(1, i + 4)
+          term.write("[" .. menuOptions[i] .. "]")
+        end
+
+        -- Afficher la liste de musique
         local startIndex = (currentPage - 1) * itemsPerPage + 1
         local endIndex = math.min(startIndex + itemsPerPage - 1, totalOptions)
 
         for i = startIndex, endIndex do
           local optionIndex = i - startIndex + 1
+          option = musicList[i]
+
           if optionIndex == selectedIndex then
             term.setTextColor(colors.green)
-            option = musicList[i] .. " "
+            option = option .. " "
           else
             term.setTextColor(colors.gray)
           end
-          term.setCursorPos(1, i + 4)
+
+          term.setCursorPos(1, i + 8)
           term.write("[" .. option .. "]")
         end
 
@@ -108,13 +123,15 @@ if response then
         local keyName = keys.getName(key)
 
         if key == keys.up then
-          selectedIndex = selectedIndex - 1
-          if selectedIndex < 1 then
-            selectedIndex = totalOptions
+          if selectedIndex > 1 then
+            selectedIndex = selectedIndex - 1
+          else
+            selectedIndex = totalMenuOptions
           end
         elseif key == keys.down then
-          selectedIndex = selectedIndex + 1
-          if selectedIndex > totalOptions then
+          if selectedIndex < totalMenuOptions then
+            selectedIndex = selectedIndex + 1
+          else
             selectedIndex = 1
           end
         elseif key == keys.enter then
