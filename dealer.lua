@@ -90,7 +90,8 @@ if response then
           else
             term.setTextColor(colors.gray)
           end
-          print(optionIndex, " [" .. option .. "]")
+          term.setCursorPos(1, i + 4)
+          term.write("[" .. option .. "]")
         end
 
         term.setTextColor(colors.white)
@@ -100,7 +101,7 @@ if response then
         local headerTextPos = (term.getSize() - #headerText) / 2 + 1
         term.setCursorPos(headerTextPos, 3)
         term.write(headerText)
-        term.setCursorPos(1, 5)
+        term.setCursorPos(1, 7)
         term.write(totalText .. "  " .. pageText)
 
         local _, key = os.pullEvent("key")
@@ -145,4 +146,3 @@ if response then
 else
   print("Erreur lors du téléchargement du fichier de la liste de lecture.")
 end
-
