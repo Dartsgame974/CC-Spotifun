@@ -1,3 +1,4 @@
+local logoText = "Spotifo"
 local aukitPath = "aukit.lua"
 local austreamPath = "austream.lua"
 local upgradePath = "upgrade"
