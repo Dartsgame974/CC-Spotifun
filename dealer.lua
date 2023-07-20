@@ -42,6 +42,9 @@ if response then
     local easterEggActivated = false
     local rightArrowCount = 0
 
+    -- Déclaration de la variable option en dehors de la boucle while
+    local option
+
     local function displayMusicMenu()
       local itemsPerPage = 6
       local currentPage = 1
@@ -89,7 +92,7 @@ if response then
 
         for i = startIndex, endIndex do
           local optionIndex = i - startIndex + 1
-          local option = musicList[i]
+          option = musicList[i]
 
           if optionIndex == selectedIndex then
             term.setTextColor(colors.green)
