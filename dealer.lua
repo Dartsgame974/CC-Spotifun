@@ -141,19 +141,19 @@ if response then
         elseif key == keys.left and currentPage > 1 then
           currentPage = currentPage - 1
           selectedIndex = math.min(selectedIndex, endIndex - startIndex + 1)
-        elseif key == keys.right and currentPage < totalPages then
-          -- Vérifier si l'utilisateur a appuyé sur la flèche droite 6 fois depuis la dernière page
-          if currentPage == totalPages then
-            rightArrowCount = rightArrowCount + 1
-            if rightArrowCount >= 6 then
-              easterEggActivated = true
-              -- Changer ici la couleur de fond en violet pour l'easter egg
-              -- Charger la playlist alternative depuis le fichier "playlistdark.json"
-              playlistURL = "https://raw.githubusercontent.com/Miniprimestaff/music-cc/main/program/playlistdark.json"
-            end
+        elseif keyName == "right" then
+          rightArrowCount = rightArrowCount + 1
+          if currentPage == totalPages and rightArrowCount == 6 then
+            -- Activer l'easter egg si on appuie 6 fois sur la flèche droite en dernière page
+            easterEggActivated = true
+            rightArrowCount = 0
+            -- Changer ici la couleur de fond en violet pour la version alternative
+            -- Charger la playlist alternative depuis le fichier "playlistdark.json"
+            term.setBackgroundColor(colors.purple)
+            playlistURL = "https://raw.githubusercontent.com/Miniprimestaff/music-cc/main/program/playlistdark.json"
+          elseif rightArrowCount >= 6 then
+            resetEasterEgg()
           end
-          currentPage = currentPage + 1
-          selectedIndex = math.min(selectedIndex, endIndex - startIndex + 1)
         elseif key == keys.enter then
           local selectedOption = startIndex + selectedIndex - 1
           local selectedMusic = playlist[selectedOption]
